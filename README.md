@@ -1,10 +1,17 @@
+<<<<<<< HEAD
 # Computer Vision Object Detection Project
 
 A comprehensive object detection system built with PyTorch. This project provides a modular framework for loading and using pre-trained object detection models like YOLOv5 to perform inference on images.
+=======
+# Deep Learning Inference API
+
+A production-grade FastAPI application for serving PyTorch model predictions.
+>>>>>>> 110a050b6c62fb282b58c4f0bccb1ca66fe21ba2
 
 ## Project Structure
 
 ```
+<<<<<<< HEAD
 computer_vision_1/
 │
 ├── weights/
@@ -157,3 +164,84 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - PyTorch framework
 - OpenCV for image processing
 
+=======
+dl_fastapi_app/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── model.py
+│   ├── predict.py
+│   ├── schemas.py
+│   └── utils.py
+├── model/
+│   └── model.pth
+├── training_example.py
+├── requirements.txt
+└── README.md
+```
+
+## Setup
+
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+2. Train the model:
+```bash
+python training_example.py
+```
+
+3. Start the FastAPI application:
+```bash
+uvicorn app.main:app --reload
+```
+
+The API will be available at http://localhost:8000
+
+## API Usage
+
+### Predict Endpoint
+
+**Endpoint:** `POST /predict`
+
+**Request Format:**
+```json
+{
+  "features": [0.1, 0.2, 0.3, 0.4]
+}
+```
+
+**Response Format:**
+```json
+{
+  "prediction": 2
+}
+```
+
+### Example Request
+
+Using curl:
+```bash
+curl -X POST "http://localhost:8000/predict" \
+     -H "Content-Type: application/json" \
+     -d '{"features": [0.1, 0.2, 0.3, 0.4]}'
+```
+
+Using Python requests:
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/predict",
+    json={"features": [0.1, 0.2, 0.3, 0.4]}
+)
+print(response.json())
+```
+
+## Documentation
+
+Once the server is running, view the interactive API documentation at:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+>>>>>>> 110a050b6c62fb282b58c4f0bccb1ca66fe21ba2
