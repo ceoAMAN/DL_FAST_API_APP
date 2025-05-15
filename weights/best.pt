@@ -1,0 +1,100 @@
+import torch
+import cv2
+import numpy as np
+import os
+
+# Function to load the YOLO model with the trained weights
+def load_model(weights_path):
+    # Ensure the weights file exists
+    if not os.path.exists(weights_path):
+        raise FileNotFoundError(f"Model weights file '{weights_path}' not found.")
+    
+    # Load the YOLO model architecture (for YOLOv11 or a similar model)
+    model = torch.hub.load('ultralytics/yolov11', 'custom', path=weights_path)  # Update for YOLOv11
+    model.eval()  # Set model to evaluation mode
+    return model
+
+# Function to preprocess the image for the model (resize and convert to tensor)
+def preprocess_image(image_path):
+    # Ensure the image file exists
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image file '{image_path}' not found.")
+    
+    # Read the image using OpenCV
+    image = cv2.imread(image_path)  # Read the image from the path
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert image to RGB
+    
+    # Resize image to the input size expected by YOLO (e.g., 640x640)
+    resized_image = cv2.resize(image_rgb, (640, 640))  # Resize image to 640x640
+    
+    # Convert image to PyTorch tensor and normalize it
+    image_tensor = torch.tensor(resized_image).float()  # Convert to tensor
+    image_tensor = image_tensor.permute(2, 0, 1)  # Change from (H, W, C) to (C, H, W)
+    image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension (1, C, H, W)
+    
+    # Normalize to the range [0, 1]
+    image_tensor /= 255.0
+    return image, image_tensor
+
+# Function to perform object detection on the image
+def perform_inference(model, image_tensor):
+    with torch.no_grad():  # Disable gradient calculation during inference
+        results = model(image_tensor)  # Get the results from the model
+    return results
+
+# Function to post-process the results (extract boxes, scores, and class IDs)
+def post_process(results):
+    boxes = results.xyxy[0].cpu().numpy()  # Get bounding box coordinates (xyxy format)
+    scores = results.confidence[0].cpu().numpy()  # Confidence scores
+    classes = results.pred[0][:, -1].cpu().numpy()  # Class labels (IDs)
+    return boxes, scores, classes
+
+# Function to visualize the predictions on the image
+def visualize_predictions(image, boxes, scores, classes, class_names):
+    for i in range(len(boxes)):
+        x1, y1, x2, y2 = boxes[i]  # Coordinates of the bounding box
+        score = scores[i]  # Confidence score of the detection
+        class_id = int(classes[i])  # Get the class ID
+        
+        # Draw the bounding box on the image
+        color = (0, 255, 0)  # Green color for bounding box (can be randomized)
+        cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+        
+        # Add label with class name and score
+        label = f"{class_names[class_id]} {score:.2f}"  # Class name and confidence score
+        cv2.putText(image, label, (int(x1), int(y1)-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+    
+    # Save the output image
+    cv2.imwrite('output_image.jpg', image)
+    
+    # Display the image with the bounding boxes
+    cv2.imshow("Detection Results", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+# Main function to integrate all the steps
+def main():
+    weights_path = 'best.pt'  # Path to the model weights
+    image_path = 'data/images/test_image.jpg'  # Path to the input image
+    
+    # Class names (YOLO dataset or your custom classes)
+    class_names = ["class1", "class2", "class3"]  # Update with actual class names
+    
+    # Load the model
+    model = load_model(weights_path)
+    
+    # Preprocess the input image
+    image, image_tensor = preprocess_image(image_path)
+    
+    # Perform inference
+    results = perform_inference(model, image_tensor)
+    
+    # Post-process the results
+    boxes, scores, classes = post_process(results)
+    
+    # Visualize the results
+    visualize_predictions(image, boxes, scores, classes, class_names)
+
+# Run the script
+if __name__ == '__main__':
+    main()

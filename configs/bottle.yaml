@@ -1,0 +1,51 @@
+# YOLOv11 Punch Detection Configuration
+
+# Dataset paths
+train: ../data/images/train/
+val: ../data/images/val/
+test: ../data/images/test/
+
+# Classes
+nc: 1  # number of classes
+names: ['punch']  # class names
+
+# Training parameters
+img_size: [640, 640]  # input image dimensions
+batch_size: 16  # batch size
+epochs: 100  # total training epochs
+workers: 4  # dataloader workers
+
+# Augmentation parameters
+hsv_h: 0.015  # image HSV-Hue augmentation (fraction)
+hsv_s: 0.7  # image HSV-Saturation augmentation (fraction)
+hsv_v: 0.4  # image HSV-Value augmentation (fraction)
+degrees: 0.0  # image rotation (+/- deg)
+translate: 0.1  # image translation (+/- fraction)
+scale: 0.5  # image scale (+/- gain)
+shear: 0.0  # image shear (+/- deg)
+perspective: 0.0  # image perspective (+/- fraction), range 0-0.001
+flipud: 0.0  # image flip up-down (probability)
+fliplr: 0.5  # image flip left-right (probability)
+mosaic: 1.0  # image mosaic (probability)
+mixup: 0.0  # image mixup (probability)
+
+# Optimization parameters
+lr0: 0.01  # initial learning rate
+lrf: 0.01  # final OneCycleLR learning rate (lr0 * lrf)
+momentum: 0.937  # SGD momentum/Adam beta1
+weight_decay: 0.0005  # optimizer weight decay
+warmup_epochs: 3.0  # warmup epochs
+warmup_momentum: 0.8  # warmup initial momentum
+warmup_bias_lr: 0.1  # warmup initial bias lr
+
+# Additional parameters
+iou_thresh: 0.6  # NMS IoU threshold for validation
+conf_thresh: 0.001  # confidence threshold for validation
+verbose: True  # verbose output
+
+# Specific to punch detection
+class_weights: [1.0]  # class weights (optional)
+box_loss_gain: 0.05  # box loss gain
+cls_loss_gain: 0.5  # cls loss gain
+obj_loss_gain: 1.0  # obj loss gain
+focal_loss_gamma: 0.0  # focal loss gamma
